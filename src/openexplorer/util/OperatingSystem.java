@@ -23,13 +23,18 @@ package openexplorer.util;
  * 
  */
 
+import java.io.File;
+import java.io.IOException;
+
 import openexplorer.Activator;
 import openexplorer.preferences.IPreferenceConstants;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * OperatingSystem singleton
+ * 
  * @author <a href="mailto:samson959@gmail.com">Samson Wu</a>
  * @version 1.5.0
  */
@@ -42,45 +47,70 @@ public enum OperatingSystem {
 
 	private String os;
 
+	private String systemBrowser;
+
 	private OperatingSystem() {
 		os = System.getProperty("osgi.os");
 	}
 
 	/**
-     * @return the systemBrowser
-     */
-    public String getSystemBrowser() {
-    	String systemBrowser = null;
-    	if (isWindows()) {
+	 * @return the systemBrowser
+	 */
+	public String getSystemBrowser() {
+		if (systemBrowser != null) {
+			return systemBrowser;
+		}
+		if (isWindows()) {
 			systemBrowser = IFileManagerExecutables.EXPLORER;
 		} else if (isLinux()) {
-			IPreferenceStore store = Activator.getDefault()
-			        .getPreferenceStore();
-			systemBrowser = store
-			        .getString(IPreferenceConstants.LINUX_FILE_MANAGER);
+			IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+			systemBrowser = store.getString(IPreferenceConstants.LINUX_FILE_MANAGER);
 			if (systemBrowser.equals(IFileManagerExecutables.OTHER)) {
-				systemBrowser = store
-				        .getString(IPreferenceConstants.LINUX_FILE_MANAGER_PATH);
+				systemBrowser = store.getString(IPreferenceConstants.LINUX_FILE_MANAGER_PATH);
 			}
 		} else if (isMacOSX()) {
 			systemBrowser = IFileManagerExecutables.FINDER;
 		}
-    	return systemBrowser;
-    }
-    
-    public String getOS() {
-    	return os;
-    }
+		return systemBrowser;
+	}
 
-    public boolean isWindows() {
-    	return WINDOWS.equalsIgnoreCase(os);
-    }
-    
-    public boolean isMacOSX() {
-    	return MACOSX.equalsIgnoreCase(this.os);
-    }
-    
-    public boolean isLinux() {
-    	return LINUX.equalsIgnoreCase(os);
-    }
+	public String getOS() {
+		return os;
+	}
+
+	public boolean isWindows() {
+		return WINDOWS.equalsIgnoreCase(os);
+	}
+
+	public boolean isMacOSX() {
+		return MACOSX.equalsIgnoreCase(os);
+	}
+
+	public boolean isLinux() {
+		return LINUX.equalsIgnoreCase(os);
+	}
+
+	public void openInBrowser(IResource resource) throws IOException {
+		String location = resource.getLocation().toOSString();
+		File file = new File(location);
+		openInBrowser(file);
+	}
+
+	public void openInBrowser(File file) throws IOException {
+		String browser = getSystemBrowser();
+		String location = file.getAbsolutePath();
+		boolean isFile = file.isFile();
+		if (isWindows()) {
+			if (isFile) {
+				browser += " /select,";
+			}
+			Runtime.getRuntime().exec(browser + " \"" + location + "\"");
+		} else {
+			if (isFile) {
+				location = file.getParentFile().getAbsolutePath();
+			}
+			Runtime.getRuntime().exec(new String[] { browser, location });
+		}
+	}
+
 }
