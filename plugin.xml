@@ -15,6 +15,27 @@
                toolbarPath="OpenExplorer"
                tooltip="Open Explorer">
          </action>
+         <action
+               class="openexplorer.actions.OpenEclipseHomeAction"
+               definitionId="openexplorer.commands.OpenEclipseHome"
+               id="openexplorer.actions.OpenEclipseHome"
+               label="Open Eclipse Home"
+               menubarPath="file/openExplorer.menu/additions"
+               style="push">
+         </action>
+         <action
+               class="openexplorer.actions.OpenWorkspaceAction"
+               definitionId="openexplorer.commands.OpenWorkspace"
+               id="openexplorer.actions.OpenWorkspace"
+               label="Open Workspace"
+               menubarPath="file/openExplorer.menu/additions"
+               style="push">
+         </action>
+         <menu
+               id="openExplorer.menu"
+               label="OpenExplorer"
+               path="file/group.file">
+         </menu>
       </actionSet>
    </extension>
    <extension
@@ -51,5 +72,29 @@
       <initializer
             class="openexplorer.preferences.PreferenceInitializer">
       </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            id="openexplorer.commands.OpenEclipseHome"
+            name="Open Eclipse Home">
+      </command>
+      <command
+            id="openexplorer.commands.OpenWorkspace"
+            name="Open Workspace">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="openexplorer.commands.OpenEclipseHome"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+E">
+      </key>
+      <key
+            commandId="openexplorer.commands.OpenWorkspace"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M3+W">
+      </key>
    </extension>
 </plugin>
